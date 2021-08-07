@@ -29,25 +29,31 @@ int main(void)
     spi_m_sync_enable(&SPI_0);
 
 	i2c_m_sync_get_io_descriptor(&I2C_0, &i2c_io);
-    i2c_m_sync_set_baudrate(&I2C_0, 48000000, 400000);
 	i2c_m_sync_enable(&I2C_0);
 	i2c_m_sync_set_slaveaddr(&I2C_0, 0x53, I2C_M_SEVEN);
 	io_write(i2c_io, (uint8_t *)"Hello World!", 12);
 
+    // TODO init ADXL345 - verify DEVID
+
+    // Enable accelerometer
+    adxl345_write_reg_byte(i2c_io, ADXL345Reg_DATA_FORMAT, ADXL345_FULL_RES);
+    adxl345_write_reg_byte(i2c_io, ADXL345Reg_POWER_CTL, ADXL345_MEASURE);
+
     while(1)
     {
-//        uint8_t devid;
         char buf[32];
+        int16_t g[3];
+        adxl345_read_reg(i2c_io, ADXL345Reg_DATAX0, g, 6);
 
 //        gpio_set_pin_level(SPI_nSS, false);
-        sprintf(buf, "dev ID: %02x\n", adxl345_read_reg(i2c_io, ADXL345Reg_DEVID));
+        sprintf(buf, "(%d, %d, %d)\n", g[0], g[1], g[2]);
         io_write(usart_io, (uint8_t *) buf, strlen(buf));
 //        io_write(spi_io, (uint8_t *) "Hello, World!", 13);
 //        gpio_set_pin_level(SPI_nSS, true);
 
 
 
-        delay_ms(1000);
+        delay_ms(100);
     }
 
     for(uint32_t i = 0; ++i;)
