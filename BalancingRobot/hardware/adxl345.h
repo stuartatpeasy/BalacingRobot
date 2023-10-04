@@ -12,7 +12,8 @@
 
 
 #define ADXL345_DEVID           (0xe5)      // ADXL345 device ID (register 0x00), 345 in octal
-
+#define ADXL345_I2C_ADDR        (0x53)      // ADXL345 I2C default device address
+#define ADXL345_I2C_ALT_ADDR    (0x1d)      // ADXL345 I2C alternative device address
 
 #define ADXL345_DATARATE_MASK   (0xf)
 #define ADXL345_DATARATE_SHIFT  (0)
@@ -112,11 +113,19 @@ typedef enum ADXL345Reg
 } ADXL345Reg_t;
 
 
-uint8_t adxl345_read_reg_byte(struct io_descriptor * const io, const ADXL345Reg_t reg);
-uint16_t adxl345_read_reg_word(struct io_descriptor * const io, const ADXL345Reg_t reg);
-void adxl345_read_reg(struct io_descriptor * const io, const ADXL345Reg_t reg, uint8_t * const buf,
-                  const size_t count);
-void adxl345_write_reg_byte(struct io_descriptor * const io, const ADXL345Reg_t reg, const uint8_t val);
+typedef struct ADXL345Measurement
+{
+    int16_t     x;
+    int16_t     y;
+    int16_t     z;
+} __attribute__((packed)) ADXL345Measurement_t;
 
+
+void adxl345_init(struct i2c_m_sync_desc * const desc);
+uint8_t adxl345_read_reg_byte(const ADXL345Reg_t reg);
+uint16_t adxl345_read_reg_word(const ADXL345Reg_t reg);
+void adxl345_read_reg(const ADXL345Reg_t reg, void * const buf, const size_t count);
+void adxl345_write_reg_byte(const ADXL345Reg_t reg, const uint8_t val);
+void adxl345_measure(ADXL345Measurement_t * const data);
 
 #endif /* ADXL345_H_ */

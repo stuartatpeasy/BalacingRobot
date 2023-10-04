@@ -14,7 +14,6 @@
 #include <hpl_pm_base.h>
 
 #include <hpl_adc_base.h>
-#include <hpl_rtc_base.h>
 
 struct spi_m_sync_descriptor SPI_0;
 struct timer_descriptor      TIMER_0;
@@ -33,14 +32,14 @@ void ADC_0_PORT_init(void)
 {
 
 	// Disable digital pin circuitry
-	gpio_set_pin_direction(PB02, GPIO_DIRECTION_OFF);
+	gpio_set_pin_direction(AIN10, GPIO_DIRECTION_OFF);
 
-	gpio_set_pin_function(PB02, PINMUX_PB02B_ADC_AIN10);
+	gpio_set_pin_function(AIN10, PINMUX_PB02B_ADC_AIN10);
 
 	// Disable digital pin circuitry
-	gpio_set_pin_direction(PB03, GPIO_DIRECTION_OFF);
+	gpio_set_pin_direction(AIN11, GPIO_DIRECTION_OFF);
 
-	gpio_set_pin_function(PB03, PINMUX_PB03B_ADC_AIN11);
+	gpio_set_pin_function(AIN11, PINMUX_PB03B_ADC_AIN11);
 }
 
 void ADC_0_CLOCK_init(void)
@@ -61,30 +60,30 @@ void EXTERNAL_IRQ_0_init(void)
 	_gclk_enable_channel(EIC_GCLK_ID, CONF_GCLK_EIC_SRC);
 
 	// Set pin direction to input
-	gpio_set_pin_direction(IRQ6, GPIO_DIRECTION_IN);
+	gpio_set_pin_direction(INT10, GPIO_DIRECTION_IN);
 
-	gpio_set_pin_pull_mode(IRQ6,
+	gpio_set_pin_pull_mode(INT10,
 	                       // <y> Pull configuration
 	                       // <id> pad_pull_config
 	                       // <GPIO_PULL_OFF"> Off
 	                       // <GPIO_PULL_UP"> Pull-up
 	                       // <GPIO_PULL_DOWN"> Pull-down
-	                       GPIO_PULL_OFF);
+	                       GPIO_PULL_DOWN);
 
-	gpio_set_pin_function(IRQ6, PINMUX_PB22A_EIC_EXTINT6);
+	gpio_set_pin_function(INT10, PINMUX_PA30A_EIC_EXTINT10);
 
 	// Set pin direction to input
-	gpio_set_pin_direction(IRQ7, GPIO_DIRECTION_IN);
+	gpio_set_pin_direction(INT11, GPIO_DIRECTION_IN);
 
-	gpio_set_pin_pull_mode(IRQ7,
+	gpio_set_pin_pull_mode(INT11,
 	                       // <y> Pull configuration
 	                       // <id> pad_pull_config
 	                       // <GPIO_PULL_OFF"> Off
 	                       // <GPIO_PULL_UP"> Pull-up
 	                       // <GPIO_PULL_DOWN"> Pull-down
-	                       GPIO_PULL_OFF);
+	                       GPIO_PULL_DOWN);
 
-	gpio_set_pin_function(IRQ7, PINMUX_PB23A_EIC_EXTINT7);
+	gpio_set_pin_function(INT11, PINMUX_PA31A_EIC_EXTINT11);
 
 	ext_irq_init();
 }
@@ -214,9 +213,10 @@ void delay_driver_init(void)
  */
 static void TIMER_0_init(void)
 {
-	_pm_enable_bus_clock(PM_BUS_APBA, RTC);
-	_gclk_enable_channel(RTC_GCLK_ID, CONF_GCLK_RTC_SRC);
-	timer_init(&TIMER_0, RTC, _rtc_get_timer());
+	_pm_enable_bus_clock(PM_BUS_APBC, TC3);
+	_gclk_enable_channel(TC3_GCLK_ID, CONF_GCLK_TC3_SRC);
+
+	timer_init(&TIMER_0, TC3, _tc_get_timer());
 }
 
 void PWM_0_PORT_init(void)
@@ -244,14 +244,14 @@ void DAC_0_PORT_init(void)
 {
 
 	// Disable digital pin circuitry
-	gpio_set_pin_direction(PA02, GPIO_DIRECTION_OFF);
+	gpio_set_pin_direction(DAC0_VOUT, GPIO_DIRECTION_OFF);
 
-	gpio_set_pin_function(PA02, PINMUX_PA02B_DAC_VOUT);
+	gpio_set_pin_function(DAC0_VOUT, PINMUX_PA02B_DAC_VOUT);
 
 	// Disable digital pin circuitry
-	gpio_set_pin_direction(PA03, GPIO_DIRECTION_OFF);
+	gpio_set_pin_direction(DAC0_VREFP, GPIO_DIRECTION_OFF);
 
-	gpio_set_pin_function(PA03, PINMUX_PA03B_DAC_VREFP);
+	gpio_set_pin_function(DAC0_VREFP, PINMUX_PA03B_DAC_VREFP);
 }
 
 void DAC_0_CLOCK_init(void)
@@ -272,6 +272,20 @@ void system_init(void)
 {
 	init_mcu();
 
+	// GPIO on PA00
+
+	gpio_set_pin_level(MOTOR_STB,
+	                   // <y> Initial level
+	                   // <id> pad_initial_level
+	                   // <false"> Low
+	                   // <true"> High
+	                   false);
+
+	// Set pin direction to output
+	gpio_set_pin_direction(MOTOR_STB, GPIO_DIRECTION_OUT);
+
+	gpio_set_pin_function(MOTOR_STB, GPIO_PIN_FUNCTION_OFF);
+
 	// GPIO on PA07
 
 	gpio_set_pin_level(SPI_nSS,
@@ -279,7 +293,7 @@ void system_init(void)
 	                   // <id> pad_initial_level
 	                   // <false"> Low
 	                   // <true"> High
-	                   false);
+	                   true);
 
 	// Set pin direction to output
 	gpio_set_pin_direction(SPI_nSS, GPIO_DIRECTION_OUT);
@@ -342,117 +356,33 @@ void system_init(void)
 
 	gpio_set_pin_function(MOTORA3, GPIO_PIN_FUNCTION_OFF);
 
-	// GPIO on PA14
+	// GPIO on PB22
 
-	gpio_set_pin_level(MOTORB0,
+	gpio_set_pin_level(nLED_GREEN,
 	                   // <y> Initial level
 	                   // <id> pad_initial_level
 	                   // <false"> Low
 	                   // <true"> High
-	                   false);
+	                   true);
 
 	// Set pin direction to output
-	gpio_set_pin_direction(MOTORB0, GPIO_DIRECTION_OUT);
+	gpio_set_pin_direction(nLED_GREEN, GPIO_DIRECTION_OUT);
 
-	gpio_set_pin_function(MOTORB0, GPIO_PIN_FUNCTION_OFF);
+	gpio_set_pin_function(nLED_GREEN, GPIO_PIN_FUNCTION_OFF);
 
-	// GPIO on PA15
+	// GPIO on PB23
 
-	gpio_set_pin_level(MOTORB1,
+	gpio_set_pin_level(nLED_RED,
 	                   // <y> Initial level
 	                   // <id> pad_initial_level
 	                   // <false"> Low
 	                   // <true"> High
-	                   false);
+	                   true);
 
 	// Set pin direction to output
-	gpio_set_pin_direction(MOTORB1, GPIO_DIRECTION_OUT);
+	gpio_set_pin_direction(nLED_RED, GPIO_DIRECTION_OUT);
 
-	gpio_set_pin_function(MOTORB1, GPIO_PIN_FUNCTION_OFF);
-
-	// GPIO on PA16
-
-	gpio_set_pin_level(MOTORB2,
-	                   // <y> Initial level
-	                   // <id> pad_initial_level
-	                   // <false"> Low
-	                   // <true"> High
-	                   false);
-
-	// Set pin direction to output
-	gpio_set_pin_direction(MOTORB2, GPIO_DIRECTION_OUT);
-
-	gpio_set_pin_function(MOTORB2, GPIO_PIN_FUNCTION_OFF);
-
-	// GPIO on PA17
-
-	gpio_set_pin_level(MOTORB3,
-	                   // <y> Initial level
-	                   // <id> pad_initial_level
-	                   // <false"> Low
-	                   // <true"> High
-	                   false);
-
-	// Set pin direction to output
-	gpio_set_pin_direction(MOTORB3, GPIO_DIRECTION_OUT);
-
-	gpio_set_pin_function(MOTORB3, GPIO_PIN_FUNCTION_OFF);
-
-	// GPIO on PA18
-
-	gpio_set_pin_level(MOTORC0,
-	                   // <y> Initial level
-	                   // <id> pad_initial_level
-	                   // <false"> Low
-	                   // <true"> High
-	                   false);
-
-	// Set pin direction to output
-	gpio_set_pin_direction(MOTORC0, GPIO_DIRECTION_OUT);
-
-	gpio_set_pin_function(MOTORC0, GPIO_PIN_FUNCTION_OFF);
-
-	// GPIO on PA19
-
-	gpio_set_pin_level(MOTORC1,
-	                   // <y> Initial level
-	                   // <id> pad_initial_level
-	                   // <false"> Low
-	                   // <true"> High
-	                   false);
-
-	// Set pin direction to output
-	gpio_set_pin_direction(MOTORC1, GPIO_DIRECTION_OUT);
-
-	gpio_set_pin_function(MOTORC1, GPIO_PIN_FUNCTION_OFF);
-
-	// GPIO on PA20
-
-	gpio_set_pin_level(MOTORC2,
-	                   // <y> Initial level
-	                   // <id> pad_initial_level
-	                   // <false"> Low
-	                   // <true"> High
-	                   false);
-
-	// Set pin direction to output
-	gpio_set_pin_direction(MOTORC2, GPIO_DIRECTION_OUT);
-
-	gpio_set_pin_function(MOTORC2, GPIO_PIN_FUNCTION_OFF);
-
-	// GPIO on PA21
-
-	gpio_set_pin_level(MOTORC3,
-	                   // <y> Initial level
-	                   // <id> pad_initial_level
-	                   // <false"> Low
-	                   // <true"> High
-	                   false);
-
-	// Set pin direction to output
-	gpio_set_pin_direction(MOTORC3, GPIO_DIRECTION_OUT);
-
-	gpio_set_pin_function(MOTORC3, GPIO_PIN_FUNCTION_OFF);
+	gpio_set_pin_function(nLED_RED, GPIO_PIN_FUNCTION_OFF);
 
 	ADC_0_init();
 	EXTERNAL_IRQ_0_init();
@@ -466,7 +396,6 @@ void system_init(void)
 	delay_driver_init();
 
 	TIMER_0_init();
-
 	PWM_0_init();
 
 	DAC_0_init();

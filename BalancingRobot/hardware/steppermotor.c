@@ -9,7 +9,8 @@
 #include <stdint.h>
 #include "hardware/steppermotor.h"
 
-#define STEPPER_SEQ_FULL        (0xc639)
+//#define STEPPER_SEQ_FULL        (0xc639)
+#define STEPPER_SEQ_FULL        (0x6a95)
 #define STEPPER_SEQ_MASK        (0x000f)
 
 #define STEPPER_SEQ_CW(seq)     ((uint16_t) (((seq) << 12) | ((seq) >> 4)))

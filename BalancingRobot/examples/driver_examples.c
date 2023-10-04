@@ -24,11 +24,11 @@ void ADC_0_example(void)
 	}
 }
 
-static void button_on_PB22_pressed(void)
+static void button_on_PA30_pressed(void)
 {
 }
 
-static void button_on_PB23_pressed(void)
+static void button_on_PA31_pressed(void)
 {
 }
 
@@ -38,8 +38,8 @@ static void button_on_PB23_pressed(void)
 void EXTERNAL_IRQ_0_example(void)
 {
 
-	ext_irq_register(PIN_PB22, button_on_PB22_pressed);
-	ext_irq_register(PIN_PB23, button_on_PB23_pressed);
+	ext_irq_register(PIN_PA30, button_on_PA30_pressed);
+	ext_irq_register(PIN_PA31, button_on_PA31_pressed);
 }
 
 /**
@@ -84,6 +84,7 @@ void delay_example(void)
 }
 
 static struct timer_task TIMER_0_task1, TIMER_0_task2;
+
 /**
  * Example of using TIMER_0.
  */

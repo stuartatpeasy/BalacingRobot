@@ -32,6 +32,7 @@ extern "C" {
 
 #include <hal_delay.h>
 #include <hal_timer.h>
+#include <hpl_tc_base.h>
 #include <hal_pwm.h>
 #include <hpl_tc_base.h>
 
